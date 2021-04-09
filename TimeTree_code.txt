@@ -1,11 +1,11 @@
 #Sequence assembly and Timetree creation of C. difficile isolates downloaded from He et al., 2013. 
 
-#1. Assemble the fastq files. assemblies is directory with all fastqs.
+#1. Assemble the fastq files. assemblies is directory with all fastqs. Using Pepperell lab RGA pipleine that is included on the GitHub repository.
 
 mtopf@BaseByte:~/temp-mtopf/all_He_data/assemblies$ while read f; do ../../../../../home/myoungblom/scripts/scripts/RGAPepPipe.sh $f ../../../../../opt/data/cdiff/R20291.fasta; done < He_accessions.txt
 
 
-With parallel: goes much faster
+***With parallel: goes much faster
 
 cat He_accessions.txt | parallel -I% ../../../../../home/myoungblom/scripts/scripts/RGAPepPipe.sh % ../../../../../opt/data/cdiff/R20291.fasta
 
@@ -14,7 +14,7 @@ rest_of_accessio#note: pilonVCFtoFasta does not work. this must be re-run after 
 ~/temp-mtopf/all_He_data/He,etal_2013/RGAPepPipe_MAY/VCFtoFasta.py *.vcf 
 
 
-#now we have fasta files
+#now we have fasta files. I concatenate all of them into one input to make the tree out of.
 
 cat *.fasta > input.fasta
 
@@ -25,7 +25,7 @@ vim input.fasta
 :%s/RGA_to_FN545816.1//g
 :%s/Clostridium difficile R20291 complete genome//g
 
-#make a tree
+#make a tree using Fasttree version 2.1.9. 
 
 /opt/PepPrograms/FastTree-2.1.9 -nt -gamma -slow -boot 100 input.fasta > tree.out
 
@@ -34,10 +34,5 @@ ssh -X mtopf@basebyte
 opt/PepPrograms/dendroscope/Dendroscope
 open the folder, export as .newick
 
-#make TimeTree
-Here, I had to switch to working on my computer because timetree on the server wasnt working. 
-
-timetree/bin/timetree —-tree —- dates —- alignment (cat fastas)
- 
 #head to R to visualize! save everything on computer.
 
