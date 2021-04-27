@@ -4,10 +4,6 @@
 # Runs the RGA pipeline
 # Usage: RGAPepPipe.sh <run_accession> <path/to/reference>
 #####
-
-# fastq-dump
-/opt/PepPrograms/sratoolkit.2.9.2-ubuntu64/bin/fastq-dump --split-files --gzip $1
-
 # fastqc
 /opt/PepPrograms/FastQC-0.11.8/fastqc $1_1.fastq.gz $1_2.fastq.gz -t 4
 
