@@ -1,9 +1,0 @@
-
-#BEAST analysis
-#install BEAST2, tracer, and figtree from github.
-git clone https://github.com/CompEvol/beast2
-git clone https://github.com/rambaut/figtree/releases
-git clone https://github.com/beast-dev/tracer/
-
-#used clustalW to align my fasta file
-clustal w -infile=input.fasta -align -outfile=beast_input
