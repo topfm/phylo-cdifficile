@@ -1,0 +1,15 @@
+#Homoplasy analysis
+# making vcf using core gene alignment using snp-sites
+/opt/PepPrograms/snp_sites-2.0.3/src/snp-sites -v input.fasta 
+#now we have the vcf of the alignment. 
+#remove gaps, aka the "?" that mess up the homoplasy analysis. 
+#note: anything that Tatum has written needs python 2 . 
+mtopf@BaseByte:~/temp-mtopf/2021.04.20_Homoplasy$ python2 ../scripts/formatConverters/gaplessVCF.py input.fasta.vcf input.fasta
+#export pythonpath
+export PYTHONPATH=../scripts/treetime/bin/treetime
+#run treetime homoplasy
+treetime homoplasy --aln gapless.vcf --vcf-reference /opt/data/cdiff/R20291.fasta --tree tree.tree --rescale 0.0147 --detailed -n 300 > homoplasy.out
+
+
+
+
