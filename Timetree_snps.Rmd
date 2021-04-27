@@ -1,0 +1,151 @@
+---
+title: "Treetime_and_SNP"
+output: html_document
+---
+```{r setup, include=FALSE}
+library(ggtree)
+library(tidyverse)
+library(phangorn)
+library(dplyr)
+
+
+require(treeio)
+require(cowplot)
+require(splitstackshape)
+
+require(viridis)
+require(ape)
+library(phytools)
+
+
+```
+
+```{r cars}
+#Read the midpoint rooted Fasttree file of He et al 2013
+#tre <- read.tree("/Users/madelinetopf/2021.03.01_Fasttree/tree.tree")
+tre <- read.tree("/Users/madelinetopf/Beast_2021.04.14/RAxML_bestTree.tree")
+tre <- read.raxml("/Users/madelinetopf/Beast_2021.04.14/out.nexus")
+
+#tre <- read.nexus(("/Users/madelinetopf/2021.03.01_Fasttree/2021-03-02-0001_treetime/timetree.nexus"))
+
+#Read snp info into dataframe
+date <- read.csv("/Users/madelinetopf/2021.01.27_Timetree/He_dates.csv", header = TRUE, stringsAsFactors = FALSE)
+colnames(date) <- c("isolate", "dates")
+
+#read 6109 tposon info 
+#colnames(df) <- c("t1", "isolate")
+#df <- df[!grepl("Name",df$t1),]
+#df <- df[!grepl("Description",df$t1),]
+#df <- df[!grepl("Number",df$t1),]
+#df$isolate <- gsub("t1:", "", df$isolate)
+#df$isolate <- as.factor(df$isolate)
+#write_csv(df, "/Users/madelinetopf/2021.03.23_tposon/6192transposon_out.csv")
+
+df <- read.csv("/Users/madelinetopf/2021.03.23_tposon/6192transposon_out.csv", na.strings=c("","NA"))
+df$isolate <- gsub(" E", "E", df$isolate)
+colnames(df) <- c("isolate", "t1", "t2")
+df <- na.omit(df)
+
+#merge transposon info with date info
+dates <- merge(date, df)
+```
+
+```{r}
+#plot tree with times of each sample collected
+treedates <- as.data.frame(tre$tip.label)
+colnames(treedates) <- "isolate"
+treedates <- merge(treedates, dates, by= "isolate")
+treedates[nrow(treedates) + 1,] = c("R20921","2000")
+#plotTreeTime(tre, tip.dates = treedates$date, show.tip.label = FALSE, show.node.label= FALSE)
+
+snps1 <- as.data.frame(read.csv("/Users/madelinetopf/2021.01.30_Timetree/gyrA_snpmatrix.vcf.csv", header=T, stringsAsFactors = F))
+snps2 <- as.data.frame(read.csv("/Users/madelinetopf/2021.01.30_Timetree/timetree_snps.vcf_SNPmatrix.csv", header=T, stringsAsFactors = F))
+
+snps <- merge(snps1, snps2)
+colnames(snps) <- c("isolate", "gyrA", "nimB")
+snps$isolate <- as.character(snps$isolate)
+iso <- merge(dates, snps) 
+
+
+
+iso$gyrA[iso$gyrA == 0] <- -1
+#iso$gyrA[iso$gyrA == 1] <- "C/G"
+#iso$nimB[iso$nimB== 0] <- "C/G"
+#iso$nimB[iso$nimB== 1] <- "A/T"
+
+iso$snp_presence <- (iso$nimB + iso$gyrA)
+
+#Order snp info dataframe by tree tip label
+iso <- iso[match(tre$tip.label,iso$isolate),]
+
+#save tip labels before adding the source
+OG_tipLabel <- tre$tip.label
+
+iso$t1 <- gsub("1", "FQR1", iso$t1)
+iso$t2 <- gsub("1", "FQR2", iso$t1)
+
+
+
+```
+
+
+```{r}
+#as factor
+iso <- na.omit(iso)
+iso$snp_presence<- as.factor(iso$snp_presence)
+
+#plot tree
+#r <- ggtree(tre, mrsd= "2010-01-01", layout = "rectangular", size = 1, ladderize = F) + theme_tree2()
+r <- ggtree(tre, size= 1, ladderize= F)
+r
+
+
+#add tips
+s <- r %<+% iso + geom_tippoint(aes(color= snp_presence), size=3, na.rm = TRUE) + scale_color_manual(values=c("hotpink", "blue", "black"), labels = c("gyrA and nimB", "nimB only", "none", "")) + theme(legend.position = c(.5,.5), text = element_text(size=18, face = "bold")) + labs(color= "SNP") + geom_tiplab()
+s
+#s + geom_tiplab(aes(label = t1))
+
+
+
+```
+
+
+
+```{r}
+snps <- as.data.frame(read.csv("/Users/madelinetopf/Timetree_0127/output.vcf_SNPmatrix.csv", header=T, stringsAsFactors = F))
+ colnames(snps) <- c("isolate", "snp_presence", "x")
+ 
+snps$x <- NULL
+snps$snp_presence <- as.factor(snps$snp_presence)
+snps <- snps %>% mutate(isolate=factor(isolate,levels=x)) %>% arrange(isolate)
+rownames(snps) <- snps$isolate
+snps <- snps[-1]
+
+```
+
+
+```{r pressure, echo=FALSE}
+g <- gheatmap(s,snps,colnames=TRUE, colnames_position = 'top', font.size = 3,color="darkgray",colnames_angle = 45, colnames_offset_y = 5) 
+
+g
+
+```
+
+```{r pressure, echo=FALSE}
+#function to export plot
+ExportPlot <- function(gplot, filename, width=2, height=1.5) {
+  # Export plot in PDF and EPS.
+  # Notice that A4: width=11.69, height=8.27
+  ggsave(paste(filename, '.pdf', sep=""), gplot, width = width, height = height)
+  postscript(file = paste(filename, '.eps', sep=""), width = width, height = height, family = "sans")
+  print(gplot)
+  dev.off()
+  png(file = paste(filename, '_.png', sep=""), width = width * 100, height = height * 100)
+  print(gplot)
+  dev.off()
+}
+
+#export plot
+setwd("/Users/madi/Desktop/2020.09.23_CdiffFst/")
+ExportPlot(g, "9.24_Cdiff_RGA_FT_Fstoutliers", width=8, height=10)
+```
