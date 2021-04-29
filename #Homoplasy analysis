@@ -7,6 +7,8 @@
 mtopf@BaseByte:~/temp-mtopf/2021.04.20_Homoplasy$ python2 ../scripts/formatConverters/gaplessVCF.py input.fasta.vcf input.fasta
 #export pythonpath
 export PYTHONPATH=../scripts/treetime/bin/treetime
+#run treetime
+treetime --aln input.fasta --tree tree.tree --dates He_dates -out_dir treetime_out/
 #run treetime homoplasy
 treetime homoplasy --aln gapless.vcf --vcf-reference /opt/data/cdiff/R20291.fasta --tree tree.tree --rescale 0.0147 --detailed -n 300 > homoplasy.out
 
