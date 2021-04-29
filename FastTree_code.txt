@@ -1,38 +1,32 @@
 #Sequence assembly and Timetree creation of C. difficile isolates downloaded from He et al., 2013. 
 
-#1. Assemble the fastq files. assemblies is directory with all fastqs. Using Pepperell lab RGA pipleine that is included on the GitHub repository.
+#To start, I had raw fastq illumina paired end reads for 127 C. difficile genomes. They were labeled by accession. I made a .txt file called accessions.txt which is just a list of the labels of the fastq files. The rough label would be "Accession_1.fastq" for read 1 and "Accession_2.fastq" for read 2. 
+#I also have the c.difficile reference whole genome, which is R20291.fasta and is used for the reference guided assembly.
 
-mtopf@BaseByte:~/temp-mtopf/all_He_data/assemblies$ while read f; do ../../../../../home/myoungblom/scripts/scripts/RGAPepPipe.sh $f ../../../../../opt/data/cdiff/R20291.fasta; done < He_accessions.txt
+#1. Assemble the fastq files. I put all fastqs in one directory. Using Pepperell lab RGA pipleine that is included on the GitHub repository. 
 
+home/mtopf/temp-mtopf/all_He_data/assemblies$ while read f; do ../../../../../home/myoungblom/scripts/scripts/RGAPepPipe.sh $f ../../../../../opt/data/cdiff/R20291.fasta; done < He_accessions.txt
 
-***With parallel: goes much faster
-
-cat He_accessions.txt | parallel -I% ../../../../../home/myoungblom/scripts/scripts/RGAPepPipe.sh % ../../../../../opt/data/cdiff/R20291.fasta
-
-rest_of_accessio#note: pilonVCFtoFasta does not work. this must be re-run after peppipe completes. 
-
-~/temp-mtopf/all_He_data/He,etal_2013/RGAPepPipe_MAY/VCFtoFasta.py *.vcf 
-
-
+#this assembly takes a while, a few days. But at the end the output is many _pilon.fasta files!
 #now we have fasta files. I concatenate all of them into one input to make the tree out of.
 
-cat *.fasta > input.fasta
-
-vim input.fasta
-#remove the weird labels of the headers
+home/mtopf/temp-mtopf/all_He_data/assemblies$ cat *.fasta > input.fasta
+home/mtopf/temp-mtopf/all_He_data/assemblies$ vim input.fasta
+#remove the weird labels of the headers that have pilon and the information about the reference genome (also called FN4816.1//g)
 :%s/_pilon//g
 :%s/pilon_//g
 :%s/RGA_to_FN545816.1//g
 :%s/Clostridium difficile R20291 complete genome//g
 
-#make a tree using Fasttree version 2.1.9. 
+#make a tree using Fasttree version 2.1.9. Parameter choice described in final report. Output tree will be called tree.out.
 
-/opt/PepPrograms/FastTree-2.1.9 -nt -gamma -slow -boot 100 input.fasta > tree.out
+home/mtopf/temp-mtopf/all_He_data/assemblies$ /opt/PepPrograms/FastTree-2.1.9 -nt -gamma -slow -boot 100 input.fasta > tree.out
 
-#use dendroscope to convert fasttree to newick format
+#use dendroscope to convert fasttree to newick format.
+#to do this, I have to re-ssh into the server using -X which allows use of Dendroscope format 
 ssh -X mtopf@basebyte
-opt/PepPrograms/dendroscope/Dendroscope
-open the folder, export as .newick
+mtopf@basebyte:/home/mtopf$ opt/PepPrograms/dendroscope/Dendroscope
+#open the output fasttree called tree.out; export as .newick
 
 #head to R to visualize! save everything on computer.
 
