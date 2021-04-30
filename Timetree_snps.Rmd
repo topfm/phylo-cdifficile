@@ -103,49 +103,6 @@ r
 #add tips
 s <- r %<+% iso + geom_tippoint(aes(color= snp_presence), size=3, na.rm = TRUE) + scale_color_manual(values=c("hotpink", "blue", "black"), labels = c("gyrA and nimB", "nimB only", "none", "")) + theme(legend.position = c(.5,.5), text = element_text(size=18, face = "bold")) + labs(color= "SNP") + geom_tiplab()
 s
+
 #s + geom_tiplab(aes(label = t1))
-
-
-
-```
-
-
-
-```{r}
-snps <- as.data.frame(read.csv("/Users/madelinetopf/Timetree_0127/output.vcf_SNPmatrix.csv", header=T, stringsAsFactors = F))
- colnames(snps) <- c("isolate", "snp_presence", "x")
- 
-snps$x <- NULL
-snps$snp_presence <- as.factor(snps$snp_presence)
-snps <- snps %>% mutate(isolate=factor(isolate,levels=x)) %>% arrange(isolate)
-rownames(snps) <- snps$isolate
-snps <- snps[-1]
-
-```
-
-
-```{r pressure, echo=FALSE}
-g <- gheatmap(s,snps,colnames=TRUE, colnames_position = 'top', font.size = 3,color="darkgray",colnames_angle = 45, colnames_offset_y = 5) 
-
-g
-
-```
-
-```{r pressure, echo=FALSE}
-#function to export plot
-ExportPlot <- function(gplot, filename, width=2, height=1.5) {
-  # Export plot in PDF and EPS.
-  # Notice that A4: width=11.69, height=8.27
-  ggsave(paste(filename, '.pdf', sep=""), gplot, width = width, height = height)
-  postscript(file = paste(filename, '.eps', sep=""), width = width, height = height, family = "sans")
-  print(gplot)
-  dev.off()
-  png(file = paste(filename, '_.png', sep=""), width = width * 100, height = height * 100)
-  print(gplot)
-  dev.off()
-}
-
-#export plot
-setwd("/Users/madi/Desktop/2020.09.23_CdiffFst/")
-ExportPlot(g, "9.24_Cdiff_RGA_FT_Fstoutliers", width=8, height=10)
 ```
