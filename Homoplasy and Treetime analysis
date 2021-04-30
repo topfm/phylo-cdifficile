@@ -6,7 +6,7 @@
 mtopf@BaseByte:/opt/PepPrograms/snp_sites-2.0.3/src/snp-sites -v input.fasta 
 #now we have the vcf of the alignment. The snp-sites prints a .vcf file as output.
 
-#Next, we need to remove remove gaps. From our assembly pipeline, "gaps" happen when the assembler is not sure of the nucleic acid identity. It puts in a "?"
+#Next, we need to remove gaps. From our assembly pipeline, "gaps" happen when the assembler is not sure of the nucleic acid identity. It puts in a "?"
 #For homoplasy analysis, we want to remove the gaps, otherwise, it will count the "?" as a homoplasy. 
 
 #note: This needs python 2 to run. 
