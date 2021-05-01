@@ -1,5 +1,6 @@
 #Sequence assembly and Timetree creation of C. difficile isolates downloaded from He et al., 2013. 
-
+#need RGAPepPipe script and corresponding programs (detailed in RGAPepPipe.sh) 
+#download Dendroscope. Download FastTree. Download R.
 #To start, I had raw fastq illumina paired end reads for 127 C. difficile genomes. They were labeled by accession. I made a .txt file called accessions.txt which is just a list of the labels of the fastq files. The rough label would be "Accession_1.fastq" for read 1 and "Accession_2.fastq" for read 2. 
 #I also have the c.difficile reference whole genome, which is R20291.fasta and is used for the reference guided assembly.
 
