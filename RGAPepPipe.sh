@@ -2,6 +2,7 @@
 
 #####
 # Runs the RGA pipeline
+#Programs to download: fastqc, trimGalore, bwa, samtools, picard, gatK, pilon, qualimap
 # Usage: RGAPepPipe.sh <run_accession> <path/to/reference>
 #####
 # fastqc
