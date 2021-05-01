@@ -1,4 +1,5 @@
 #Homoplasy analysis on C. difficile whole genome assemblies using Treetime.
+#Software to download: Treetime, Snp-sites, gaplessVCF.py, Dendroscope, 
 
 # making vcf of core gene alignment using snp-sites. It will determine SNPs in each genome as compared to the reference. 
 #input.fasta is an alignment file of all the whole genomes of C. difficile in my dataset, including the reference strain assembled genome.
